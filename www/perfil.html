@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meu perfil | Agosto Dourado</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FFF8E1',
+                            400: '#F4C430',
+                            500: '#D4A017',
+                            600: '#B8860B',
+                            900: '#6B4E00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+
+
+<body class="bg-amber-50/30 text-gray-800">
+
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+
+            <a href="index.html"
+                class="text-2xl font-extrabold text-gold-900">
+
+                AGOSTO DOURADO
+
+            </a>
+
+
+            <div class="flex gap-2 flex-wrap">
+
+                <a href="index.html"
+                    class="px-4 py-2 rounded-lg hover:bg-gold-100">
+                    Início
+                </a>
+
+                <a href="comunidade.html"
+                    class="px-4 py-2 rounded-lg hover:bg-gold-100">
+                    Comunidade
+                </a>
+
+                <a href="perfil.html"
+                    class="px-4 py-2 rounded-lg bg-gold-100 text-gold-900 font-bold">
+                    Meu perfil
+                </a>
+
+                <button
+                    onclick="sair()"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white">
+                    Sair
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <main class="max-w-5xl mx-auto px-6 py-10">
+
+
+        <!-- PERFIL -->
+
+        <section class="bg-white rounded-3xl shadow-md p-8 mb-8">
+
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+
+                <div
+                    class="w-28 h-28 rounded-full bg-gold-100 flex items-center justify-center text-5xl">
+                    👤
+                </div>
+
+
+                <div class="text-center md:text-left">
+
+                    <h1 id="nome"
+                        class="text-3xl font-extrabold text-gold-900">
+                    </h1>
+
+                    <p id="email"
+                        class="text-gray-600 mt-2">
+                    </p>
+
+                    <p id="dataCadastro"
+                        class="text-sm text-gray-400 mt-2">
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ESTATÍSTICAS -->
+
+        <section class="grid sm:grid-cols-3 gap-5 mb-8">
+
+            <div class="bg-white rounded-2xl shadow p-6 text-center">
+
+                <p id="totalPublicacoes"
+                    class="text-3xl font-extrabold text-gold-600">
+                    0
+                </p>
+
+                <p class="text-gray-500 mt-1">
+                    Publicações
+                </p>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl shadow p-6 text-center">
+
+                <p id="totalCurtidas"
+                    class="text-3xl font-extrabold text-gold-600">
+                    0
+                </p>
+
+                <p class="text-gray-500 mt-1">
+                    Curtidas recebidas
+                </p>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl shadow p-6 text-center">
+
+                <p id="totalComentarios"
+                    class="text-3xl font-extrabold text-gold-600">
+                    0
+                </p>
+
+                <p class="text-gray-500 mt-1">
+                    Comentários
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PUBLICAÇÕES -->
+
+        <section>
+
+            <h2 class="text-2xl font-bold text-gold-900 mb-5">
+                Minhas publicações
+            </h2>
+
+            <div id="minhasPublicacoes"
+                class="space-y-5">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        // =============================
+        // VERIFICAR LOGIN
+        // =============================
+
+        const usuario =
+            JSON.parse(
+                localStorage.getItem("agostoUsuarioLogado")
+            );
+
+
+        if (!usuario) {
+
+            window.location.href =
+                "login.html";
+
+        }
+
+
+        // =============================
+        // INFORMAÇÕES
+        // =============================
+
+        document.getElementById("nome").textContent =
+            usuario?.nome || "";
+
+        document.getElementById("email").textContent =
+            usuario?.email || "";
+
+
+        if (usuario?.dataCadastro) {
+
+            const data =
+                new Date(usuario.dataCadastro);
+
+            document.getElementById("dataCadastro").textContent =
+                "Membro desde " +
+                data.toLocaleDateString("pt-BR");
+
+        }
+
+
+        // =============================
+        // PUBLICAÇÕES
+        // =============================
+
+        function carregarPerfil() {
+
+            const publicacoes =
+                JSON.parse(
+                    localStorage.getItem("agostoPublicacoes")
+                ) || [];
+
+
+            const minhas =
+                publicacoes.filter(
+                    publicacao =>
+                        publicacao.usuarioId === usuario.id
+                );
+
+
+            document.getElementById("totalPublicacoes")
+                .textContent = minhas.length;
+
+
+            let curtidas = 0;
+
+            let comentarios = 0;
+
+
+            minhas.forEach(publicacao => {
+
+                curtidas +=
+                    publicacao.curtidas.length;
+
+                comentarios +=
+                    publicacao.comentarios.length;
+
+            });
+
+
+            document.getElementById("totalCurtidas")
+                .textContent = curtidas;
+
+
+            document.getElementById("totalComentarios")
+                .textContent = comentarios;
+
+
+            const container =
+                document.getElementById(
+                    "minhasPublicacoes"
+                );
+
+
+            if (minhas.length === 0) {
+
+                container.innerHTML = `
+
+                    <div class="bg-white rounded-2xl shadow p-8 text-center">
+
+                        <div class="text-5xl mb-4">
+                            💛
+                        </div>
+
+                        <h3 class="text-xl font-bold mb-2">
+                            Você ainda não publicou nada.
+                        </h3>
+
+                        <p class="text-gray-500 mb-5">
+                            Compartilhe sua primeira experiência na comunidade.
+                        </p>
+
+                        <a
+                            href="comunidade.html"
+                            class="inline-block bg-gold-500 text-white px-6 py-3 rounded-xl font-bold">
+
+                            Ir para comunidade
+
+                        </a>
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            container.innerHTML = "";
+
+
+            minhas.forEach(publicacao => {
+
+                const div =
+                    document.createElement("article");
+
+
+                div.className =
+                    "bg-white rounded-2xl shadow p-6";
+
+
+                div.innerHTML = `
+
+                    <div class="flex justify-between mb-4">
+
+                        <div>
+
+                            <h3 class="font-bold">
+                                ${escaparHTML(publicacao.nome)}
+                            </h3>
+
+                            <p class="text-xs text-gray-400">
+                                ${publicacao.data}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="leading-relaxed mb-5">
+                        ${escaparHTML(publicacao.texto)}
+                    </p>
+
+
+                    <div class="flex gap-5 text-sm text-gray-500">
+
+                        <span>
+                            💛 ${publicacao.curtidas.length} curtidas
+                        </span>
+
+                        <span>
+                            💬 ${publicacao.comentarios.length} comentários
+                        </span>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(div);
+
+            });
+
+        }
+
+
+        // =============================
+        // ESCAPAR HTML
+        // =============================
+
+        function escaparHTML(texto) {
+
+            const div =
+                document.createElement("div");
+
+            div.textContent = texto;
+
+            return div.innerHTML;
+
+        }
+
+
+        // =============================
+        // SAIR
+        // =============================
+
+        function sair() {
+
+            localStorage.removeItem(
+                "agostoUsuarioLogado"
+            );
+
+            window.location.href =
+                "index.html";
+
+        }
+
+
+        carregarPerfil();
+
+    </script>
+
+</body>
+</html>

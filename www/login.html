@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Entrar | Agosto Dourado</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FFF8E1',
+                            400: '#F4C430',
+                            500: '#D4A017',
+                            600: '#B8860B',
+                            900: '#6B4E00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+
+
+<body class="min-h-screen bg-amber-50 flex items-center justify-center px-6">
+
+    <div class="w-full max-w-md">
+
+        <div class="text-center mb-8">
+
+            <a href="index.html"
+                class="text-3xl font-extrabold text-gold-900">
+                AGOSTO DOURADO
+            </a>
+
+            <p class="text-gray-600 mt-2">
+                Entre para participar da comunidade.
+            </p>
+
+        </div>
+
+
+        <div class="bg-white rounded-3xl shadow-xl p-8">
+
+            <h1 class="text-2xl font-bold mb-6">
+                Entrar
+            </h1>
+
+
+            <form id="formLogin" class="space-y-5">
+
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        required
+                        placeholder="Digite seu e-mail"
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-gold-400">
+
+                </div>
+
+
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        required
+                        placeholder="Digite sua senha"
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-gold-400">
+
+                </div>
+
+
+                <p id="mensagem"
+                    class="hidden text-center text-sm font-semibold">
+                </p>
+
+
+                <button
+                    type="submit"
+                    class="w-full bg-gold-500 text-white py-3 rounded-xl font-bold hover:bg-gold-600 transition">
+
+                    Entrar
+
+                </button>
+
+            </form>
+
+
+            <div class="text-center mt-6">
+
+                <p class="text-gray-600">
+                    Ainda não possui uma conta?
+                </p>
+
+                <a href="cadastro.html"
+                    class="text-gold-600 font-bold hover:underline">
+                    Criar conta
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="text-center mt-5">
+
+            <a href="index.html"
+                class="text-gray-600 hover:text-gold-600">
+                ← Voltar para o início
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const formLogin =
+            document.getElementById("formLogin");
+
+
+        formLogin.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+
+            const email =
+                document.getElementById("email")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+            const senha =
+                document.getElementById("senha")
+                    .value;
+
+
+            const mensagem =
+                document.getElementById("mensagem");
+
+
+            const usuarios =
+                JSON.parse(
+                    localStorage.getItem("agostoUsuarios")
+                ) || [];
+
+
+            const usuario =
+                usuarios.find(
+                    usuario =>
+                        usuario.email === email &&
+                        usuario.senha === senha
+                );
+
+
+            if (!usuario) {
+
+                mensagem.textContent =
+                    "E-mail ou senha incorretos.";
+
+                mensagem.className =
+                    "text-center text-sm font-semibold text-red-600";
+
+                return;
+            }
+
+
+            localStorage.setItem(
+                "agostoUsuarioLogado",
+                JSON.stringify(usuario)
+            );
+
+
+            mensagem.textContent =
+                "Login realizado com sucesso!";
+
+            mensagem.className =
+                "text-center text-sm font-semibold text-green-600";
+
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "comunidade.html";
+
+            }, 700);
+
+        });
+
+    </script>
+
+</body>
+</html>

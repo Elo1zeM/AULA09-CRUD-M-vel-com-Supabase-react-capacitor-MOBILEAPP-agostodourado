@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Agosto Dourado</string>
+    <string name="title_activity_main">Agosto Dourado</string>
+    <string name="package_name">com.agosto.dourado</string>
+    <string name="custom_url_scheme">com.agosto.dourado</string>
+</resources>

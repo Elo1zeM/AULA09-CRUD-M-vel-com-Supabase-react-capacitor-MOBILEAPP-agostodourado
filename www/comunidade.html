@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Comunidade | Agosto Dourado</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FFF8E1',
+                            400: '#F4C430',
+                            500: '#D4A017',
+                            600: '#B8860B',
+                            900: '#6B4E00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+</head>
+
+
+<body class="bg-amber-50/30 text-gray-800">
+
+
+    <!-- NAVBAR -->
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+
+            <a href="index.html" class="text-2xl font-extrabold text-gold-900">
+
+                AGOSTO DOURADO
+
+            </a>
+
+
+            <div class="flex gap-2 flex-wrap">
+
+                <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-gold-100">
+                    Início
+                </a>
+
+                <a href="comunidade.html" class="px-4 py-2 rounded-lg bg-gold-100 text-gold-900 font-bold">
+                    Comunidade
+                </a>
+
+                <a href="perfil.html" class="px-4 py-2 rounded-lg hover:bg-gold-100">
+                    Meu perfil
+                </a>
+
+                <button onclick="sair()" class="px-4 py-2 rounded-lg bg-gray-800 text-white">
+                    Sair
+                </button>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <main class="max-w-4xl mx-auto px-6 py-10">
+
+
+        <!-- CABEÇALHO -->
+
+        <div class="text-center mb-10">
+
+            <h1 class="text-4xl font-extrabold text-gold-900 mb-3">
+                Comunidade 💛
+            </h1>
+
+            <p class="text-gray-600">
+                Compartilhe dicas, experiências e mensagens de apoio.
+            </p>
+
+        </div>
+
+
+        <!-- NOVA PUBLICAÇÃO -->
+
+        <section class="bg-white rounded-3xl shadow-md p-6 mb-8">
+
+            <div class="flex items-center gap-3 mb-5">
+
+                <div class="w-12 h-12 rounded-full bg-gold-100 flex items-center justify-center text-xl">
+                    👤
+                </div>
+
+                <div>
+
+                    <p id="nomeUsuario" class="font-bold">
+                    </p>
+
+                    <p class="text-sm text-gray-500">
+                        Compartilhe algo com a comunidade
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <textarea id="textoPublicacao" rows="4" maxlength="500" placeholder="Escreva sua publicação..."
+                class="w-full border rounded-2xl p-4 resize-none outline-none focus:ring-2 focus:ring-gold-400">
+            </textarea>
+
+
+            <div class="flex justify-between items-center mt-4">
+
+                <span id="contador" class="text-sm text-gray-500">
+                    0/500
+                </span>
+
+                <button onclick="publicar()"
+                    class="bg-gold-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-gold-600 transition">
+                    Publicar
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- PUBLICAÇÕES -->
+
+        <section>
+
+            <h2 class="text-2xl font-bold text-gold-900 mb-5">
+                Publicações
+            </h2>
+
+            <div id="listaPublicacoes" class="space-y-5">
+            </div>
+
+        </section>
+
+    </main>
+
+   <script>
+
+    // =============================
+    // USUÁRIO LOGADO
+    // =============================
+
+    const usuario =
+        JSON.parse(
+            localStorage.getItem("agostoUsuarioLogado")
+        );
+
+    if (!usuario) {
+        window.location.href = "login.html";
+    }
+
+    document.getElementById("nomeUsuario").textContent =
+        usuario?.nome || "";
+
+
+    // =============================
+    // CONTADOR
+    // =============================
+
+    const textarea =
+        document.getElementById("textoPublicacao");
+
+    const contador =
+        document.getElementById("contador");
+
+    textarea.addEventListener("input", function () {
+
+        contador.textContent =
+            `${textarea.value.length}/500`;
+
+    });
+
+
+    // =============================
+    // PUBLICAR
+    // =============================
+
+    async function publicar() {
+
+        const texto =
+            textarea.value.trim();
+
+        if (!texto) {
+            alert("Digite alguma coisa antes de publicar.");
+            return;
+        }
+
+        try {
+
+            const resposta = await fetch(
+                "http://localhost:3000/api/publicacoes",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: usuario.email,
+                        conteudo: texto
+                    })
+                }
+            );
+
+            const resultado =
+                await resposta.json();
+
+            if (!resposta.ok) {
+                alert(resultado.erro || "Erro ao publicar.");
+                return;
+            }
+
+            textarea.value = "";
+            contador.textContent = "0/500";
+
+            await carregarPublicacoes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert("Não foi possível conectar ao backend.");
+
+        }
+    }
+
+
+    // =============================
+    // CARREGAR PUBLICAÇÕES
+    // =============================
+
+    async function carregarPublicacoes() {
+
+        const lista =
+            document.getElementById("listaPublicacoes");
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "http://localhost:3000/api/publicacoes"
+                );
+
+            const publicacoes =
+                await resposta.json();
+
+            if (!resposta.ok) {
+
+                lista.innerHTML = `
+                    <p class="text-red-500">
+                        ${publicacoes.erro}
+                    </p>
+                `;
+
+                return;
+            }
+
+            if (publicacoes.length === 0) {
+
+                lista.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow p-8 text-center">
+
+                        <div class="text-5xl mb-4">
+                            💛
+                        </div>
+
+                        <h3 class="text-xl font-bold mb-2">
+                            Ainda não existem publicações.
+                        </h3>
+
+                        <p class="text-gray-500">
+                            Seja a primeira pessoa a compartilhar algo!
+                        </p>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+            lista.innerHTML = "";
+
+            for (const publicacao of publicacoes) {
+
+                const nome =
+                    publicacao.perfis?.nome || "Usuário";
+
+                const data =
+                    new Date(
+                        publicacao.created_at
+                    ).toLocaleString("pt-BR");
+
+
+                // Buscar curtidas
+                const respostaCurtidas =
+                    await fetch(
+                        `http://localhost:3000/api/curtidas/${publicacao.id}`
+                    );
+
+                const curtidas =
+                    await respostaCurtidas.json();
+
+
+                const curtiu =
+                    curtidas.some(
+                        curtida =>
+                            curtida.usuario_id === usuario.id
+                    );
+
+
+                // Buscar comentários
+                const respostaComentarios =
+                    await fetch(
+                        `http://localhost:3000/api/comentarios/${publicacao.id}`
+                    );
+
+                const comentarios =
+                    await respostaComentarios.json();
+
+
+                const div =
+                    document.createElement("article");
+
+                div.className =
+                    "bg-white rounded-3xl shadow-md p-6";
+
+
+                div.innerHTML = `
+
+                    <div class="flex justify-between gap-4 mb-5">
+
+                        <div class="flex gap-3">
+
+                            <div class="w-11 h-11 rounded-full bg-gold-100 flex items-center justify-center">
+                                👤
+                            </div>
+
+                            <div>
+
+                                <h3 class="font-bold">
+                                    ${escaparHTML(nome)}
+                                </h3>
+
+                                <p class="text-xs text-gray-500">
+                                    ${data}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <p class="leading-relaxed mb-5">
+                        ${escaparHTML(publicacao.conteudo)}
+                    </p>
+
+
+                    <div class="flex gap-3 border-t pt-4">
+
+                        <button
+                            onclick="curtir(${publicacao.id})"
+                            class="px-4 py-2 rounded-lg ${
+                                curtiu
+                                    ? "bg-gold-100 text-gold-900"
+                                    : "hover:bg-gray-100"
+                            }">
+
+                            ${curtiu ? "💛 Curtido" : "♡ Curtir"}
+
+                            (${curtidas.length})
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="mt-5">
+
+                        <div class="flex gap-2">
+
+                            <input
+                                id="comentario-${publicacao.id}"
+                                type="text"
+                                maxlength="250"
+                                placeholder="Escreva um comentário..."
+                                class="flex-1 border rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-gold-400">
+
+                            <button
+                                onclick="comentar(${publicacao.id})"
+                                class="bg-gray-800 text-white px-4 py-2 rounded-xl">
+
+                                Enviar
+
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="mt-4 space-y-3">
+
+                            ${
+                                mostrarComentarios(
+                                    comentarios
+                                )
+                            }
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                lista.appendChild(div);
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            lista.innerHTML = `
+                <div class="bg-white rounded-2xl shadow p-8 text-center">
+                    <p class="text-red-500">
+                        Não foi possível conectar ao backend.
+                    </p>
+                </div>
+            `;
+
+        }
+
+    }
+
+
+    // =============================
+    // CURTIR
+    // =============================
+
+    async function curtir(publicacaoId) {
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "http://localhost:3000/api/curtidas",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            publicacao_id: publicacaoId,
+                            email: usuario.email
+                        })
+                    }
+                );
+
+
+            const resultado =
+                await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                alert(
+                    resultado.erro ||
+                    "Erro ao curtir publicação."
+                );
+
+                return;
+            }
+
+
+            await carregarPublicacoes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Não foi possível conectar ao backend."
+            );
+
+        }
+
+    }
+
+
+    // =============================
+    // COMENTAR
+    // =============================
+
+    async function comentar(publicacaoId) {
+
+        const input =
+            document.getElementById(
+                `comentario-${publicacaoId}`
+            );
+
+
+        const texto =
+            input.value.trim();
+
+
+        if (!texto) {
+            return;
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "http://localhost:3000/api/comentarios",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            publicacao_id: publicacaoId,
+                            email: usuario.email,
+                            conteudo: texto
+                        })
+                    }
+                );
+
+
+            const resultado =
+                await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                alert(
+                    resultado.erro ||
+                    "Erro ao comentar."
+                );
+
+                return;
+            }
+
+
+            input.value = "";
+
+            await carregarPublicacoes();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Não foi possível conectar ao backend."
+            );
+
+        }
+
+    }
+
+
+    // =============================
+    // MOSTRAR COMENTÁRIOS
+    // =============================
+
+    function mostrarComentarios(comentarios) {
+
+        if (!comentarios || comentarios.length === 0) {
+
+            return `
+                <p class="text-sm text-gray-400">
+                    Nenhum comentário ainda.
+                </p>
+            `;
+
+        }
+
+
+        return comentarios.map(comentario => {
+
+            const nome =
+                comentario.perfis?.nome ||
+                "Usuário";
+
+
+            const data =
+                new Date(
+                    comentario.created_at
+                ).toLocaleString("pt-BR");
+
+
+            return `
+
+                <div class="bg-gray-50 rounded-xl p-3">
+
+                    <div class="flex justify-between">
+
+                        <strong class="text-sm">
+                            ${escaparHTML(nome)}
+                        </strong>
+
+                        <span class="text-xs text-gray-400">
+                            ${data}
+                        </span>
+
+                    </div>
+
+                    <p class="text-sm mt-1">
+                        ${escaparHTML(comentario.conteudo)}
+                    </p>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+    // =============================
+    // SEGURANÇA
+    // =============================
+
+    function escaparHTML(texto) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent = texto;
+
+        return div.innerHTML;
+
+    }
+
+
+    // =============================
+    // SAIR
+    // =============================
+
+    function sair() {
+
+        localStorage.removeItem(
+            "agostoUsuarioLogado"
+        );
+
+        window.location.href =
+            "index.html";
+
+    }
+
+
+    // =============================
+    // INICIAR
+    // =============================
+
+    carregarPublicacoes();
+
+</script>
+
+</body>
+
+</html>

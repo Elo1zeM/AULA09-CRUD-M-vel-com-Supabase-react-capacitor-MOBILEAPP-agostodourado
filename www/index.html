@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Agosto Dourado</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FFF8E1',
+                            400: '#F4C430',
+                            500: '#D4A017',
+                            600: '#B8860B',
+                            900: '#6B4E00'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-amber-50/20 text-gray-800 antialiased font-sans">
+
+    <!-- NAVBAR -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <a href="index.html" class="text-2xl font-bold text-gold-600">
+                AGOSTO DOURADO
+            </a>
+
+            <div class="flex flex-wrap justify-center items-center gap-3 text-sm font-semibold">
+
+                <a href="index.html"
+                    class="px-4 py-2 rounded-lg bg-gold-100 text-gold-900 hover:bg-gold-400 transition">
+                    Início
+                </a>
+
+                <a href="comunidade.html"
+                    class="px-4 py-2 rounded-lg hover:bg-gold-100 transition">
+                    Comunidade
+                </a>
+
+                <a href="login.html" id="linkLogin"
+                    class="px-4 py-2 rounded-lg hover:bg-gold-100 transition">
+                    Entrar
+                </a>
+
+                <a href="cadastro.html" id="linkCadastro"
+                    class="px-4 py-2 rounded-lg bg-gold-500 text-white hover:bg-gold-600 transition">
+                    Criar conta
+                </a>
+
+                <a href="perfil.html" id="linkPerfil"
+                    class="hidden px-4 py-2 rounded-lg hover:bg-gold-100 transition">
+                    Meu perfil
+                </a>
+
+                <button id="btnSair"
+                    class="hidden px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900 transition">
+                    Sair
+                </button>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- CAPA -->
+    <header class="bg-gradient-to-r from-amber-100 to-yellow-50">
+        <div class="max-w-7xl mx-auto px-6 py-12 text-center">
+
+            <img
+                src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=1600&q=80"
+                alt="Mãe e bebê"
+                class="w-full max-h-[450px] object-cover rounded-3xl shadow-lg mb-10">
+
+            <h1 class="text-5xl md:text-6xl font-extrabold text-gold-900 mb-5">
+                AGOSTO DOURADO
+            </h1>
+
+            <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
+                Conscientização, proteção, apoio e incentivo ao aleitamento materno.
+            </p>
+
+            <div class="mt-8 flex flex-wrap justify-center gap-4">
+
+                <a href="cadastro.html"
+                    class="px-7 py-3 bg-gold-500 text-white rounded-xl font-bold hover:bg-gold-600 transition shadow">
+                    Criar minha conta
+                </a>
+
+                <a href="comunidade.html"
+                    class="px-7 py-3 border-2 border-gold-500 text-gold-900 rounded-xl font-bold hover:bg-gold-100 transition">
+                    Conhecer a comunidade
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+
+    <main class="max-w-7xl mx-auto px-6 py-12">
+
+        <!-- 1 -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-5">
+                1. O que é o Agosto Dourado?
+            </h2>
+
+            <div class="bg-white rounded-2xl shadow-md p-7 leading-relaxed">
+
+                <p class="mb-4">
+                    O Agosto Dourado é uma campanha dedicada à conscientização,
+                    proteção, apoio e incentivo ao aleitamento materno.
+                </p>
+
+                <p>
+                    Durante o mês de agosto, são realizadas ações para informar
+                    a população sobre a importância da amamentação e fortalecer
+                    uma rede de apoio para mães e bebês.
+                </p>
+
+            </div>
+        </section>
+
+
+        <!-- 2 -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-5">
+                2. Criação e História da Campanha
+            </h2>
+
+            <div class="bg-white rounded-2xl shadow-md p-7 leading-relaxed">
+
+                <p class="mb-4">
+                    O Agosto Dourado está relacionado à Semana Mundial de
+                    Aleitamento Materno, período criado para ampliar a
+                    conscientização sobre a importância da amamentação.
+                </p>
+
+                <p>
+                    A campanha busca envolver famílias, profissionais da saúde,
+                    instituições e toda a sociedade na construção de ambientes
+                    que apoiem a amamentação.
+                </p>
+
+            </div>
+        </section>
+
+
+        <!-- 3 -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-5">
+                3. Significado de um Mês Tão Importante
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <div class="bg-gold-100 rounded-2xl p-7 shadow">
+                    <h3 class="text-xl font-bold text-gold-900 mb-3">
+                        Por que dourado?
+                    </h3>
+
+                    <p class="leading-relaxed">
+                        A cor dourada representa o padrão de qualidade do
+                        leite materno e reforça a importância da amamentação
+                        para a saúde de mães e crianças.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-7 shadow">
+                    <h3 class="text-xl font-bold text-gold-900 mb-3">
+                        Rede de apoio
+                    </h3>
+
+                    <p class="leading-relaxed">
+                        A amamentação não depende apenas da mãe. Família,
+                        profissionais da saúde, empresas e sociedade também
+                        possuem um papel importante no apoio à mulher.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 4 -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-7">
+                4. Objetivos do Agosto Dourado
+            </h2>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">🤱</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Incentivar a amamentação
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Incentivar e valorizar o aleitamento materno.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">💛</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Oferecer apoio
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Fortalecer redes de apoio para mães e famílias.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">🏥</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Informar
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Divulgar informações confiáveis sobre amamentação.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">👨‍👩‍👧</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Envolver a família
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Incentivar a participação da família no período de
+                        amamentação.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Combater a desinformação
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Facilitar o acesso a informações adequadas.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">❤️</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Proteger
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Reforçar a importância da proteção à amamentação.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">🌎</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Conscientizar
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Ampliar a conscientização da sociedade.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <div class="text-4xl mb-4">🫶</div>
+                    <h3 class="font-bold text-lg mb-2">
+                        Criar uma rede
+                    </h3>
+                    <p class="text-sm leading-relaxed">
+                        Estimular ambientes acolhedores para mães e bebês.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- 5 -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-7">
+                5. Frases e Citações de Impacto
+            </h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+
+                <div class="bg-gold-100 border-l-4 border-gold-500 p-6 rounded-xl">
+                    <p class="italic mb-4">
+                        “Amamentar é um ato de amor e cuidado.”
+                    </p>
+                    <strong>Drauzio Varella</strong>
+                </div>
+
+                <div class="bg-white shadow p-6 rounded-xl border-l-4 border-gold-500">
+                    <p class="italic mb-4">
+                        “O aleitamento materno é uma das formas mais eficazes
+                        de garantir saúde às crianças.”
+                    </p>
+                    <strong>Organização Mundial da Saúde</strong>
+                </div>
+
+                <div class="bg-white shadow p-6 rounded-xl border-l-4 border-gold-500">
+                    <p class="italic mb-4">
+                        “Apoiar a amamentação é responsabilidade de todos.”
+                    </p>
+                    <strong>Ministério da Saúde</strong>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- VÍDEOS -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-7">
+                Vídeos
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <div class="bg-white p-5 rounded-2xl shadow">
+                    <div class="aspect-video">
+                        <iframe
+                            class="w-full h-full rounded-xl"
+                            src="https://www.youtube.com/embed/pJJyA-VVQZw"
+                            title="Agosto Dourado"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow">
+                    <div class="aspect-video">
+                        <iframe
+                            class="w-full h-full rounded-xl"
+                            src="https://www.youtube.com/embed/6JWFdI5q_LI"
+                            title="Agosto Dourado"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- CTA COMUNIDADE -->
+        <section class="mb-16">
+
+            <div class="bg-gradient-to-r from-gold-500 to-yellow-500 rounded-3xl p-10 text-center text-white shadow-lg">
+
+                <h2 class="text-3xl font-bold mb-4">
+                    Faça parte da nossa comunidade 💛
+                </h2>
+
+                <p class="max-w-2xl mx-auto mb-7">
+                    Compartilhe experiências, dicas e informações sobre
+                    amamentação com outras pessoas.
+                </p>
+
+                <a href="cadastro.html"
+                    class="inline-block bg-white text-gold-900 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition">
+                    Criar minha conta
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUIZ -->
+        <section class="mb-16">
+
+            <h2 class="text-3xl font-bold text-gold-900 mb-7">
+                Quiz Agosto Dourado
+            </h2>
+
+            <div id="quiz"
+                class="bg-white rounded-3xl shadow-lg p-8 max-w-3xl mx-auto">
+
+                <div class="mb-5">
+                    <span id="numeroQuestao"
+                        class="text-sm font-bold text-gold-600"></span>
+                </div>
+
+                <h3 id="pergunta"
+                    class="text-2xl font-bold mb-7">
+                </h3>
+
+                <div id="alternativas"
+                    class="space-y-3">
+                </div>
+
+                <div class="mt-7">
+
+                    <button id="proxima"
+                        onclick="proximaQuestao()"
+                        class="hidden bg-gold-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-gold-600 transition">
+                        Próxima
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- INFORMAÇÕES -->
+        <section class="grid md:grid-cols-2 gap-8 mb-16">
+
+            <div class="bg-white rounded-2xl shadow p-7">
+
+                <h2 class="text-2xl font-bold text-gold-900 mb-4">
+                    📞 Disque Saúde
+                </h2>
+
+                <p class="leading-relaxed">
+                    Em caso de dúvidas relacionadas à saúde, procure
+                    profissionais qualificados e os canais oficiais de
+                    atendimento.
+                </p>
+
+                <p class="text-2xl font-bold mt-5 text-gold-600">
+                    136
+                </p>
+
+            </div>
+
+
+            <div class="bg-gold-100 rounded-2xl shadow p-7">
+
+                <h2 class="text-2xl font-bold text-gold-900 mb-4">
+                    💛 Dica de Ouro
+                </h2>
+
+                <p class="leading-relaxed">
+                    Buscar informações confiáveis e contar com uma rede de
+                    apoio pode tornar o período de amamentação mais acolhedor.
+                </p>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl shadow p-7">
+
+                <h2 class="text-2xl font-bold text-gold-900 mb-4">
+                    💡 Curiosidade
+                </h2>
+
+                <p class="leading-relaxed">
+                    O dourado foi escolhido para representar a importância
+                    e a qualidade do aleitamento materno.
+                </p>
+
+            </div>
+
+
+            <div class="bg-white rounded-2xl shadow p-7">
+
+                <h2 class="text-2xl font-bold text-gold-900 mb-4">
+                    ⚖️ Direito Legal
+                </h2>
+
+                <p class="leading-relaxed">
+                    A proteção e o apoio à amamentação fazem parte de
+                    políticas públicas voltadas à saúde materno-infantil.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white">
+
+        <div class="max-w-7xl mx-auto px-6 py-10 text-center">
+
+            <h3 class="text-2xl font-bold text-gold-400 mb-3">
+                AGOSTO DOURADO
+            </h3>
+
+            <p class="text-gray-300 mb-5">
+                Informação, apoio e conscientização.
+            </p>
+
+            <div class="flex justify-center gap-5 flex-wrap">
+
+                <a href="index.html" class="hover:text-gold-400">
+                    Início
+                </a>
+
+                <a href="comunidade.html" class="hover:text-gold-400">
+                    Comunidade
+                </a>
+
+                <a href="cadastro.html" class="hover:text-gold-400">
+                    Criar conta
+                </a>
+
+                <a href="login.html" class="hover:text-gold-400">
+                    Entrar
+                </a>
+
+            </div>
+
+            <p class="text-gray-500 text-sm mt-8">
+                Projeto desenvolvido para fins educacionais.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        // =========================
+        // USUÁRIO
+        // =========================
+
+        const usuarioLogado =
+            JSON.parse(localStorage.getItem("agostoUsuarioLogado"));
+
+        const linkLogin = document.getElementById("linkLogin");
+        const linkCadastro = document.getElementById("linkCadastro");
+        const linkPerfil = document.getElementById("linkPerfil");
+        const btnSair = document.getElementById("btnSair");
+
+        if (usuarioLogado) {
+
+            linkLogin.classList.add("hidden");
+            linkCadastro.classList.add("hidden");
+
+            linkPerfil.classList.remove("hidden");
+            btnSair.classList.remove("hidden");
+
+        }
+
+        btnSair.addEventListener("click", function () {
+
+            localStorage.removeItem("agostoUsuarioLogado");
+
+            window.location.reload();
+
+        });
+
+
+        // =========================
+        // QUIZ
+        // =========================
+
+        const perguntas = [
+
+            {
+                pergunta: "Qual é o objetivo principal do Agosto Dourado?",
+                alternativas: [
+                    "Incentivar o aleitamento materno",
+                    "Incentivar atividades esportivas",
+                    "Promover campanhas de vacinação",
+                    "Combater doenças respiratórias"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "Qual mês é conhecido como Agosto Dourado?",
+                alternativas: [
+                    "Julho",
+                    "Agosto",
+                    "Setembro",
+                    "Outubro"
+                ],
+                correta: 1
+            },
+
+            {
+                pergunta: "O Agosto Dourado está relacionado principalmente a:",
+                alternativas: [
+                    "Aleitamento materno",
+                    "Saúde bucal",
+                    "Doenças cardíacas",
+                    "Alimentação escolar"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "O que a cor dourada representa na campanha?",
+                alternativas: [
+                    "A qualidade do leite materno",
+                    "A vacinação",
+                    "O verão",
+                    "A alimentação escolar"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "Quem pode fazer parte da rede de apoio à amamentação?",
+                alternativas: [
+                    "Somente médicos",
+                    "Somente a mãe",
+                    "Família, profissionais e sociedade",
+                    "Somente o bebê"
+                ],
+                correta: 2
+            },
+
+            {
+                pergunta: "A amamentação está relacionada principalmente à saúde:",
+                alternativas: [
+                    "Da mãe e do bebê",
+                    "Somente do bebê",
+                    "Somente da mãe",
+                    "Dos professores"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "Uma das funções da campanha é:",
+                alternativas: [
+                    "Combater a desinformação",
+                    "Diminuir consultas médicas",
+                    "Substituir profissionais",
+                    "Proibir campanhas"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "A Semana Mundial de Aleitamento Materno busca:",
+                alternativas: [
+                    "Ampliar a conscientização",
+                    "Promover competições",
+                    "Criar medicamentos",
+                    "Organizar eventos esportivos"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "O apoio à mãe durante a amamentação é:",
+                alternativas: [
+                    "Importante",
+                    "Desnecessário",
+                    "Proibido",
+                    "Opcional para profissionais"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "O Agosto Dourado envolve:",
+                alternativas: [
+                    "Somente hospitais",
+                    "Somente famílias",
+                    "Toda a sociedade",
+                    "Somente escolas"
+                ],
+                correta: 2
+            },
+
+            {
+                pergunta: "O número do Disque Saúde é:",
+                alternativas: [
+                    "136",
+                    "190",
+                    "192",
+                    "193"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "A campanha busca fortalecer:",
+                alternativas: [
+                    "A rede de apoio",
+                    "A competição",
+                    "O isolamento",
+                    "A desinformação"
+                ],
+                correta: 0
+            },
+
+            {
+                pergunta: "Qual dessas atitudes contribui para uma boa rede de apoio?",
+                alternativas: [
+                    "Oferecer informação e acolhimento",
+                    "Espalhar informações falsas",
+                    "Ignorar dúvidas",
+                    "Desestimular a busca por ajuda"
+                ],
+                correta: 0
+            }
+
+        ];
+
+
+        let questaoAtual = 0;
+        let pontuacao = 0;
+
+
+        function carregarQuestao() {
+
+            const questao = perguntas[questaoAtual];
+
+            document.getElementById("numeroQuestao").textContent =
+                `Questão ${questaoAtual + 1} de ${perguntas.length}`;
+
+            document.getElementById("pergunta").textContent =
+                questao.pergunta;
+
+            const alternativas =
+                document.getElementById("alternativas");
+
+            alternativas.innerHTML = "";
+
+            questao.alternativas.forEach((alternativa, index) => {
+
+                const botao = document.createElement("button");
+
+                botao.textContent = alternativa;
+
+                botao.className =
+                    "w-full text-left p-4 border rounded-xl hover:bg-gold-100 transition";
+
+                botao.onclick = function () {
+
+                    verificarResposta(index);
+
+                };
+
+                alternativas.appendChild(botao);
+
+            });
+
+            document.getElementById("proxima")
+                .classList.add("hidden");
+        }
+
+
+        function verificarResposta(resposta) {
+
+            const questao = perguntas[questaoAtual];
+
+            const botoes =
+                document.querySelectorAll("#alternativas button");
+
+            botoes.forEach(botao => {
+
+                botao.disabled = true;
+
+            });
+
+            if (resposta === questao.correta) {
+
+                pontuacao++;
+
+                botoes[resposta].classList.add(
+                    "bg-green-100",
+                    "border-green-500"
+                );
+
+            } else {
+
+                botoes[resposta].classList.add(
+                    "bg-red-100",
+                    "border-red-500"
+                );
+
+                botoes[questao.correta].classList.add(
+                    "bg-green-100",
+                    "border-green-500"
+                );
+            }
+
+            document.getElementById("proxima")
+                .classList.remove("hidden");
+        }
+
+
+        function proximaQuestao() {
+
+            questaoAtual++;
+
+            if (questaoAtual < perguntas.length) {
+
+                carregarQuestao();
+
+            } else {
+
+                document.getElementById("quiz").innerHTML = `
+
+                    <div class="text-center">
+
+                        <div class="text-6xl mb-5">
+                            💛
+                        </div>
+
+                        <h3 class="text-3xl font-bold text-gold-900 mb-4">
+                            Quiz finalizado!
+                        </h3>
+
+                        <p class="text-xl mb-6">
+                            Você acertou
+                            <strong>${pontuacao}</strong>
+                            de
+                            <strong>${perguntas.length}</strong>
+                            questões.
+                        </p>
+
+                        <button
+                            onclick="reiniciarQuiz()"
+                            class="bg-gold-500 text-white px-7 py-3 rounded-xl font-bold hover:bg-gold-600">
+                            Fazer novamente
+                        </button>
+
+                    </div>
+
+                `;
+            }
+        }
+
+
+        function reiniciarQuiz() {
+
+            questaoAtual = 0;
+            pontuacao = 0;
+
+            document.getElementById("quiz").innerHTML = `
+
+                <div class="mb-5">
+                    <span id="numeroQuestao"
+                        class="text-sm font-bold text-gold-600">
+                    </span>
+                </div>
+
+                <h3 id="pergunta"
+                    class="text-2xl font-bold mb-7">
+                </h3>
+
+                <div id="alternativas"
+                    class="space-y-3">
+                </div>
+
+                <div class="mt-7">
+
+                    <button id="proxima"
+                        onclick="proximaQuestao()"
+                        class="hidden bg-gold-500 text-white px-6 py-3 rounded-xl font-bold">
+                        Próxima
+                    </button>
+
+                </div>
+            `;
+
+            carregarQuestao();
+        }
+
+
+        carregarQuestao();
+
+    </script>
+
+</body>
+</html>

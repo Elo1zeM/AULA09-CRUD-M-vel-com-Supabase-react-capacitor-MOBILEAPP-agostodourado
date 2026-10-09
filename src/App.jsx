@@ -47,10 +47,10 @@ export default function App() {
 
   async function verificarUsuario() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    setUsuario(user ?? null);
+    setUsuario(session?.user ?? null);
   }
 
   // =========================
@@ -81,6 +81,21 @@ export default function App() {
 
     setEmailLogin("");
     setSenhaLogin("");
+  }
+
+  // =========================
+  // LOGIN COM GOOGLE
+  // =========================
+
+  async function entrarComGoogle() {
+    setErro("");
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+
+    if (error) setErro(error.message);
   }
 
   // =========================
@@ -324,6 +339,20 @@ export default function App() {
             </button>
           </form>
 
+          <button
+            type="button"
+            onClick={entrarComGoogle}
+            style={{
+              ...botao,
+              background: "#4285F4",
+              width: "100%",
+              marginTop: "10px",
+              marginRight: 0,
+            }}
+          >
+            Entrar com Google
+          </button>
+
           {erro && <p style={erroStyle}>{erro}</p>}
         </div>
       </div>
@@ -338,12 +367,25 @@ export default function App() {
     <div style={pagina}>
       <div style={container}>
         <div style={cabecalho}>
-          <div>
-            <h1>🌟 Agosto Dourado</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {usuario.user_metadata?.avatar_url && (
+              <img
+                src={usuario.user_metadata.avatar_url}
+                alt="Foto de perfil"
+                referrerPolicy="no-referrer"
+                style={{ width: 56, height: 56, borderRadius: "50%" }}
+              />
+            )}
 
-            <p>
-              Usuário conectado: <strong>{usuario.email}</strong>
-            </p>
+            <div>
+              <h1>🌟 Agosto Dourado</h1>
+
+              <p>
+                <strong>{usuario.user_metadata?.full_name || "Usuário"}</strong>
+                <br />
+                {usuario.email}
+              </p>
+            </div>
           </div>
 
           <button onClick={sair} style={botaoSair}>

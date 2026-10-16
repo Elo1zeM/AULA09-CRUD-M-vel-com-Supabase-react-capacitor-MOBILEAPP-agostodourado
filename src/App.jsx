@@ -87,20 +87,64 @@ export default function App() {
   // LOGIN COM GOOGLE
   // =========================
 
+
 async function entrarComGoogle() {
   setErro("");
 
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: window.location.origin,
     },
   });
 
   if (error) {
+    console.error("Erro no login Google:", error);
     setErro(error.message);
+    return;
   }
+
+  console.log("Login Google iniciado:", data);
 }
+
+async function entrarComGoogle() {
+  setErro("");
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+
+  if (error) {
+    console.error("Erro no login Google:", error);
+    setErro(error.message);
+    return;
+  }
+
+  console.log("Login Google iniciado:", data);
+}
+
+async function entrarComGoogle() {
+  setErro("");
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+
+  if (error) {
+    console.error("Erro no login Google:", error);
+    setErro(error.message);
+    return;
+  }
+
+  console.log("Login Google iniciado:", data);
+}
+
 
 
   // =========================

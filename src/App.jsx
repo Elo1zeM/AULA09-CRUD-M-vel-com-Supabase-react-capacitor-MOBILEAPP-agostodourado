@@ -87,16 +87,21 @@ export default function App() {
   // LOGIN COM GOOGLE
   // =========================
 
-  async function entrarComGoogle() {
-    setErro("");
+async function entrarComGoogle() {
+  setErro("");
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/login`,
+    },
+  });
 
-    if (error) setErro(error.message);
+  if (error) {
+    setErro(error.message);
   }
+}
+
 
   // =========================
   // LOGOUT

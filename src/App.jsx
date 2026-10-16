@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "./services/supabaseClient";
 
@@ -32,29 +33,42 @@ export default function App() {
   // =========================
 
   useEffect(() => {
+    let ativo = true;
+
+    async function verificarUsuario() {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Erro ao verificar sessão:", error);
+        return;
+      }
+
+      if (ativo) {
+        setUsuario(session?.user ?? null);
+      }
+    }
+
     verificarUsuario();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUsuario(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((_evento, session) => {
+      if (ativo) {
+        setUsuario(session?.user ?? null);
+      }
     });
 
     return () => {
+      ativo = false;
       subscription.unsubscribe();
     };
   }, []);
 
-  async function verificarUsuario() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    setUsuario(session?.user ?? null);
-  }
-
   // =========================
-  // LOGIN
+  // LOGIN COM E-MAIL E SENHA
   // =========================
 
   async function entrar(e) {
@@ -64,100 +78,77 @@ export default function App() {
     setMensagem("");
     setCarregandoLogin(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: emailLogin,
-      password: senhaLogin,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailLogin,
+        password: senhaLogin,
+      });
 
-    setCarregandoLogin(false);
+      if (error) {
+        setErro("E-mail ou senha incorretos.");
+        return;
+      }
 
-    if (error) {
-      setErro("E-mail ou senha incorretos.");
-      return;
+      setUsuario(data.user);
+      setMensagem("Login realizado com sucesso!");
+
+      setEmailLogin("");
+      setSenhaLogin("");
+    } catch (error) {
+      console.error("Erro no login:", error);
+      setErro("Não foi possível realizar o login. Tente novamente.");
+    } finally {
+      setCarregandoLogin(false);
     }
-
-    setUsuario(data.user);
-    setMensagem("Login realizado com sucesso!");
-
-    setEmailLogin("");
-    setSenhaLogin("");
   }
 
   // =========================
   // LOGIN COM GOOGLE
   // =========================
 
+  async function entrarComGoogle() {
+    setErro("");
+    setMensagem("");
 
-async function entrarComGoogle() {
-  setErro("");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
 
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin,
-    },
-  });
-
-  if (error) {
-    console.error("Erro no login Google:", error);
-    setErro(error.message);
-    return;
+      if (error) {
+        console.error("Erro no login Google:", error);
+        setErro(error.message);
+      }
+    } catch (error) {
+      console.error("Erro ao iniciar login Google:", error);
+      setErro("Não foi possível iniciar o login com Google.");
+    }
   }
-
-  console.log("Login Google iniciado:", data);
-}
-
-async function entrarComGoogle() {
-  setErro("");
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin,
-    },
-  });
-
-  if (error) {
-    console.error("Erro no login Google:", error);
-    setErro(error.message);
-    return;
-  }
-
-  console.log("Login Google iniciado:", data);
-}
-
-async function entrarComGoogle() {
-  setErro("");
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: window.location.origin,
-    },
-  });
-
-  if (error) {
-    console.error("Erro no login Google:", error);
-    setErro(error.message);
-    return;
-  }
-
-  console.log("Login Google iniciado:", data);
-}
-
-
 
   // =========================
   // LOGOUT
   // =========================
 
   async function sair() {
-    await supabase.auth.signOut();
+    setErro("");
+    setMensagem("");
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Erro ao sair:", error);
+      setErro("Não foi possível sair da conta.");
+      return;
+    }
 
     setUsuario(null);
     setPerfis([]);
     limparFormulario();
-    setMensagem("");
+    setEmailLogin("");
+    setSenhaLogin("");
   }
 
   // =========================
@@ -184,10 +175,11 @@ async function entrarComGoogle() {
     setCarregando(false);
   }
 
-  // Buscar perfis quando o usuário entrar
   useEffect(() => {
     if (usuario) {
       buscarPerfis();
+    } else {
+      setPerfis([]);
     }
   }, [usuario]);
 
@@ -233,6 +225,11 @@ async function entrarComGoogle() {
       return;
     }
 
+    if (!usuario) {
+      setErro("Você precisa estar logado.");
+      return;
+    }
+
     // UPDATE
     if (editandoId) {
       const { error } = await supabase
@@ -241,7 +238,8 @@ async function entrarComGoogle() {
           nome: nome.trim(),
           bio: bio.trim(),
         })
-        .eq("id", editandoId);
+        .eq("id", editandoId)
+        .eq("id", usuario.id);
 
       if (error) {
         setErro(error.message);
@@ -250,23 +248,17 @@ async function entrarComGoogle() {
 
       setMensagem("Perfil atualizado com sucesso!");
       limparFormulario();
+      await buscarPerfis();
       return;
     }
 
     // CREATE
-    if (!usuario) {
-      setErro("Você precisa estar logado.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("perfis")
-      .insert({
-        id: usuario.id,
-        nome: nome.trim(),
-        email: usuario.email,
-        bio: bio.trim(),
-      });
+    const { error } = await supabase.from("perfis").insert({
+      id: usuario.id,
+      nome: nome.trim(),
+      email: usuario.email,
+      bio: bio.trim(),
+    });
 
     if (error) {
       if (error.code === "23505") {
@@ -280,6 +272,7 @@ async function entrarComGoogle() {
 
     setMensagem("Perfil criado com sucesso!");
     limparFormulario();
+    await buscarPerfis();
   }
 
   // =========================
@@ -287,7 +280,6 @@ async function entrarComGoogle() {
   // =========================
 
   function editarPerfil(perfil) {
-    // Só pode editar o próprio perfil
     if (perfil.id !== usuario?.id) {
       setErro("Você só pode editar o seu próprio perfil.");
       return;
@@ -326,7 +318,8 @@ async function entrarComGoogle() {
     const { error } = await supabase
       .from("perfis")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("id", usuario.id);
 
     if (error) {
       setErro(error.message);
@@ -335,6 +328,7 @@ async function entrarComGoogle() {
 
     setMensagem("Perfil excluído com sucesso!");
     limparFormulario();
+    await buscarPerfis();
   }
 
   // =========================
@@ -403,6 +397,7 @@ async function entrarComGoogle() {
           </button>
 
           {erro && <p style={erroStyle}>{erro}</p>}
+          {mensagem && <p style={sucessoStyle}>{mensagem}</p>}
         </div>
       </div>
     );
@@ -430,7 +425,11 @@ async function entrarComGoogle() {
               <h1>🌟 Agosto Dourado</h1>
 
               <p>
-                <strong>{usuario.user_metadata?.full_name || "Usuário"}</strong>
+                <strong>
+                  {usuario.user_metadata?.full_name ||
+                    usuario.user_metadata?.name ||
+                    "Usuário"}
+                </strong>
                 <br />
                 {usuario.email}
               </p>
@@ -476,7 +475,7 @@ async function entrarComGoogle() {
             <input
               type="email"
               placeholder="E-mail"
-              value={usuario.email}
+              value={usuario.email || ""}
               disabled
               style={{
                 ...campo,
@@ -492,9 +491,7 @@ async function entrarComGoogle() {
             />
 
             <button type="submit" style={botao}>
-              {editandoId
-                ? "Salvar alterações"
-                : "Criar perfil"}
+              {editandoId ? "Salvar alterações" : "Criar perfil"}
             </button>
 
             {editandoId && (
@@ -668,3 +665,4 @@ const sucessoStyle = {
   borderRadius: "8px",
   marginBottom: "20px",
 };
+

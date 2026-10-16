@@ -1,65 +1,63 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./services/supabaseClient";
 
 export default function App() {
-  // =========================
   // AUTENTICAÇÃO
-  // =========================
-
   const [usuario, setUsuario] = useState(null);
+  const [verificandoSessao, setVerificandoSessao] = useState(true);
   const [emailLogin, setEmailLogin] = useState("");
   const [senhaLogin, setSenhaLogin] = useState("");
-
   const [carregandoLogin, setCarregandoLogin] = useState(false);
+  const [carregandoGoogle, setCarregandoGoogle] = useState(false);
   const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
 
-  // =========================
   // PERFIL
-  // =========================
-
   const [perfis, setPerfis] = useState([]);
   const [carregando, setCarregando] = useState(false);
-
   const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
   const [bio, setBio] = useState("");
-
   const [editandoId, setEditandoId] = useState(null);
 
-  // =========================
-  // VERIFICAR USUÁRIO LOGADO
-  // =========================
-
+  // RECUPERAR SESSÃO E ACOMPANHAR AUTENTICAÇÃO
   useEffect(() => {
     let ativo = true;
 
-    async function verificarUsuario() {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((evento, session) => {
+      if (!ativo) return;
 
-      if (error) {
-        console.error("Erro ao verificar sessão:", error);
-        return;
+      setUsuario(session?.user ?? null);
+      setVerificandoSessao(false);
+
+      if (evento === "SIGNED_IN") {
+        setErro("");
       }
+    });
 
-      if (ativo) {
-        setUsuario(session?.user ?? null);
+    async function verificarUsuario() {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error) throw error;
+
+        if (ativo) {
+          setUsuario(data.session?.user ?? null);
+        }
+      } catch (error) {
+        console.error("Erro ao recuperar sessão:", error);
+
+        if (ativo) {
+          setErro("Não foi possível verificar sua sessão. Atualize a página.");
+        }
+      } finally {
+        if (ativo) setVerificandoSessao(false);
       }
     }
 
     verificarUsuario();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_evento, session) => {
-      if (ativo) {
-        setUsuario(session?.user ?? null);
-      }
-    });
 
     return () => {
       ativo = false;
@@ -67,71 +65,62 @@ export default function App() {
     };
   }, []);
 
-  // =========================
   // LOGIN COM E-MAIL E SENHA
-  // =========================
-
   async function entrar(e) {
     e.preventDefault();
-
     setErro("");
     setMensagem("");
     setCarregandoLogin(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailLogin,
+      const { error } = await supabase.auth.signInWithPassword({
+        email: emailLogin.trim(),
         password: senhaLogin,
       });
 
-      if (error) {
-        setErro("E-mail ou senha incorretos.");
-        return;
-      }
+      if (error) throw error;
 
-      setUsuario(data.user);
       setMensagem("Login realizado com sucesso!");
-
       setEmailLogin("");
       setSenhaLogin("");
     } catch (error) {
       console.error("Erro no login:", error);
-      setErro("Não foi possível realizar o login. Tente novamente.");
+      setErro(
+        error.message === "Invalid login credentials"
+          ? "E-mail ou senha incorretos."
+          : error.message || "Não foi possível realizar o login."
+      );
     } finally {
       setCarregandoLogin(false);
     }
   }
 
-  // =========================
   // LOGIN COM GOOGLE
-  // =========================
-
   async function entrarComGoogle() {
     setErro("");
     setMensagem("");
+    setCarregandoGoogle(true);
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
+          // Retorna para a raiz da aplicação React publicada.
           redirectTo: window.location.origin,
         },
       });
 
-      if (error) {
-        console.error("Erro no login Google:", error);
-        setErro(error.message);
-      }
+      if (error) throw error;
+
+      // O Supabase redireciona o navegador para o Google.
     } catch (error) {
-      console.error("Erro ao iniciar login Google:", error);
-      setErro("Não foi possível iniciar o login com Google.");
+      console.error("Erro no login Google:", error);
+      setErro(error.message || "Não foi possível iniciar o login com Google.");
+      setCarregandoGoogle(false);
     }
   }
 
-  // =========================
   // LOGOUT
-  // =========================
-
   async function sair() {
     setErro("");
     setMensagem("");
@@ -144,36 +133,35 @@ export default function App() {
       return;
     }
 
-    setUsuario(null);
-    setPerfis([]);
     limparFormulario();
+    setPerfis([]);
     setEmailLogin("");
     setSenhaLogin("");
+    setMensagem("Você saiu da sua conta.");
   }
 
-  // =========================
-  // READ
-  // =========================
-
-  async function buscarPerfis() {
+  // BUSCAR PERFIS
+  const buscarPerfis = useCallback(async () => {
     if (!usuario) return;
 
     setCarregando(true);
-    setErro("");
 
-    const { data, error } = await supabase
-      .from("perfis")
-      .select("id, nome, email, foto_url, bio, created_at")
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("perfis")
+        .select("id, nome, email, foto_url, bio, created_at")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      setErro(error.message);
-    } else {
+      if (error) throw error;
+
       setPerfis(data || []);
+    } catch (error) {
+      console.error("Erro ao buscar perfis:", error);
+      setErro(error.message || "Não foi possível carregar os perfis.");
+    } finally {
+      setCarregando(false);
     }
-
-    setCarregando(false);
-  }
+  }, [usuario]);
 
   useEffect(() => {
     if (usuario) {
@@ -181,12 +169,9 @@ export default function App() {
     } else {
       setPerfis([]);
     }
-  }, [usuario]);
+  }, [usuario, buscarPerfis]);
 
-  // =========================
-  // REALTIME
-  // =========================
-
+  // ATUALIZAÇÃO EM TEMPO REAL
   useEffect(() => {
     if (!usuario) return;
 
@@ -203,25 +188,32 @@ export default function App() {
           buscarPerfis();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR") {
+          console.error("Erro ao conectar ao Realtime.");
+        }
+      });
 
     return () => {
       supabase.removeChannel(canal);
     };
-  }, [usuario]);
+  }, [usuario, buscarPerfis]);
 
-  // =========================
-  // CREATE / UPDATE
-  // =========================
+  // LIMPAR FORMULÁRIO
+  function limparFormulario() {
+    setEditandoId(null);
+    setNome("");
+    setBio("");
+  }
 
+  // CRIAR E ATUALIZAR PERFIL
   async function salvarPerfil(e) {
     e.preventDefault();
-
     setErro("");
     setMensagem("");
 
     if (!nome.trim()) {
-      setErro("Digite o nome.");
+      setErro("Digite seu nome.");
       return;
     }
 
@@ -230,134 +222,124 @@ export default function App() {
       return;
     }
 
-    // UPDATE
-    if (editandoId) {
-      const { error } = await supabase
-        .from("perfis")
-        .update({
-          nome: nome.trim(),
-          bio: bio.trim(),
-        })
-        .eq("id", editandoId)
-        .eq("id", usuario.id);
+    try {
+      if (editandoId) {
+        if (editandoId !== usuario.id) {
+          setErro("Você só pode editar seu próprio perfil.");
+          return;
+        }
 
-      if (error) {
-        setErro(error.message);
-        return;
+        const { error } = await supabase
+          .from("perfis")
+          .update({
+            nome: nome.trim(),
+            bio: bio.trim(),
+          })
+          .eq("id", usuario.id);
+
+        if (error) throw error;
+
+        setMensagem("Perfil atualizado com sucesso!");
+      } else {
+        const { error } = await supabase.from("perfis").insert({
+          id: usuario.id,
+          nome: nome.trim(),
+          email: usuario.email,
+          bio: bio.trim(),
+        });
+
+        if (error) {
+          if (error.code === "23505") {
+            throw new Error(
+              "Você já possui um perfil cadastrado. Edite o perfil existente."
+            );
+          }
+
+          throw error;
+        }
+
+        setMensagem("Perfil criado com sucesso!");
       }
 
-      setMensagem("Perfil atualizado com sucesso!");
       limparFormulario();
       await buscarPerfis();
-      return;
+    } catch (error) {
+      console.error("Erro ao salvar perfil:", error);
+      setErro(error.message || "Não foi possível salvar o perfil.");
     }
-
-    // CREATE
-    const { error } = await supabase.from("perfis").insert({
-      id: usuario.id,
-      nome: nome.trim(),
-      email: usuario.email,
-      bio: bio.trim(),
-    });
-
-    if (error) {
-      if (error.code === "23505") {
-        setErro("Você já possui um perfil cadastrado.");
-      } else {
-        setErro(error.message);
-      }
-
-      return;
-    }
-
-    setMensagem("Perfil criado com sucesso!");
-    limparFormulario();
-    await buscarPerfis();
   }
 
-  // =========================
-  // EDITAR
-  // =========================
-
+  // EDITAR PERFIL
   function editarPerfil(perfil) {
     if (perfil.id !== usuario?.id) {
-      setErro("Você só pode editar o seu próprio perfil.");
+      setErro("Você só pode editar seu próprio perfil.");
       return;
     }
 
+    setErro("");
     setEditandoId(perfil.id);
     setNome(perfil.nome || "");
-    setEmail(perfil.email || usuario.email || "");
     setBio(perfil.bio || "");
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // =========================
-  // DELETE
-  // =========================
-
+  // EXCLUIR PERFIL
   async function excluirPerfil(id) {
     if (id !== usuario?.id) {
-      setErro("Você só pode excluir o seu próprio perfil.");
+      setErro("Você só pode excluir seu próprio perfil.");
       return;
     }
 
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir seu perfil?"
-    );
-
-    if (!confirmar) return;
+    if (!window.confirm("Tem certeza que deseja excluir seu perfil?")) {
+      return;
+    }
 
     setErro("");
     setMensagem("");
 
-    const { error } = await supabase
-      .from("perfis")
-      .delete()
-      .eq("id", id)
-      .eq("id", usuario.id);
+    try {
+      const { error } = await supabase
+        .from("perfis")
+        .delete()
+        .eq("id", usuario.id);
 
-    if (error) {
-      setErro(error.message);
-      return;
+      if (error) throw error;
+
+      limparFormulario();
+      setMensagem("Perfil excluído com sucesso!");
+      await buscarPerfis();
+    } catch (error) {
+      console.error("Erro ao excluir perfil:", error);
+      setErro(error.message || "Não foi possível excluir o perfil.");
     }
-
-    setMensagem("Perfil excluído com sucesso!");
-    limparFormulario();
-    await buscarPerfis();
   }
 
-  // =========================
-  // LIMPAR FORMULÁRIO
-  // =========================
-
-  function limparFormulario() {
-    setEditandoId(null);
-    setNome("");
-    setEmail("");
-    setBio("");
+  // CARREGAMENTO INICIAL
+  if (verificandoSessao) {
+    return (
+      <div style={pagina}>
+        <div style={caixaLogin}>
+          <h1>🌟 Agosto Dourado</h1>
+          <p>Verificando sua sessão...</p>
+        </div>
+      </div>
+    );
   }
 
-  // =========================
   // TELA DE LOGIN
-  // =========================
-
   if (!usuario) {
     return (
       <div style={pagina}>
         <div style={caixaLogin}>
           <h1>🌟 Agosto Dourado</h1>
-
           <p>Entre para acessar seu perfil.</p>
 
           <form onSubmit={entrar}>
             <input
               type="email"
               placeholder="E-mail"
+              autoComplete="email"
               value={emailLogin}
               onChange={(e) => setEmailLogin(e.target.value)}
               style={campo}
@@ -367,6 +349,7 @@ export default function App() {
             <input
               type="password"
               placeholder="Senha"
+              autoComplete="current-password"
               value={senhaLogin}
               onChange={(e) => setSenhaLogin(e.target.value)}
               style={campo}
@@ -376,7 +359,7 @@ export default function App() {
             <button
               type="submit"
               style={botao}
-              disabled={carregandoLogin}
+              disabled={carregandoLogin || carregandoGoogle}
             >
               {carregandoLogin ? "Entrando..." : "Entrar"}
             </button>
@@ -391,22 +374,21 @@ export default function App() {
               width: "100%",
               marginTop: "10px",
               marginRight: 0,
+              opacity: carregandoGoogle ? 0.7 : 1,
             }}
+            disabled={carregandoGoogle || carregandoLogin}
           >
-            Entrar com Google
+            {carregandoGoogle ? "Conectando ao Google..." : "Entrar com Google"}
           </button>
 
-          {erro && <p style={erroStyle}>{erro}</p>}
-          {mensagem && <p style={sucessoStyle}>{mensagem}</p>}
+          {erro && <p role="alert" style={erroStyle}>{erro}</p>}
+          {mensagem && <p role="status" style={sucessoStyle}>{mensagem}</p>}
         </div>
       </div>
     );
   }
 
-  // =========================
   // TELA PRINCIPAL
-  // =========================
-
   return (
     <div style={pagina}>
       <div style={container}>
@@ -417,13 +399,17 @@ export default function App() {
                 src={usuario.user_metadata.avatar_url}
                 alt="Foto de perfil"
                 referrerPolicy="no-referrer"
-                style={{ width: 56, height: 56, borderRadius: "50%" }}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
               />
             )}
 
             <div>
               <h1>🌟 Agosto Dourado</h1>
-
               <p>
                 <strong>
                   {usuario.user_metadata?.full_name ||
@@ -441,31 +427,19 @@ export default function App() {
           </button>
         </div>
 
-        {mensagem && (
-          <div style={sucessoStyle}>
-            {mensagem}
-          </div>
-        )}
-
-        {erro && (
-          <div style={erroStyle}>
-            {erro}
-          </div>
-        )}
-
-        {/* FORMULÁRIO */}
+        {mensagem && <div role="status" style={sucessoStyle}>{mensagem}</div>}
+        {erro && <div role="alert" style={erroStyle}>{erro}</div>}
 
         <div style={caixa}>
           <h2>
-            {editandoId
-              ? "✏️ Editar meu perfil"
-              : "➕ Criar meu perfil"}
+            {editandoId ? "✏️ Editar meu perfil" : "➕ Criar meu perfil"}
           </h2>
 
           <form onSubmit={salvarPerfil}>
             <input
               type="text"
               placeholder="Nome"
+              autoComplete="name"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               style={campo}
@@ -474,13 +448,10 @@ export default function App() {
 
             <input
               type="email"
-              placeholder="E-mail"
               value={usuario.email || ""}
               disabled
-              style={{
-                ...campo,
-                background: "#eeeeee",
-              }}
+              aria-label="E-mail da conta"
+              style={{ ...campo, background: "#eeeeee" }}
             />
 
             <textarea
@@ -506,11 +477,9 @@ export default function App() {
           </form>
         </div>
 
-        {/* LISTA */}
-
         <h2>👥 Perfis cadastrados</h2>
 
-        {carregando && <p>Carregando dados da nuvem...</p>}
+        {carregando && <p>Carregando dados...</p>}
 
         {!carregando && perfis.length === 0 && (
           <p>Nenhum perfil cadastrado.</p>
@@ -522,20 +491,16 @@ export default function App() {
           return (
             <div key={perfil.id} style={card}>
               <h2>{perfil.nome}</h2>
-
-              <p>
-                <strong>E-mail:</strong> {perfil.email}
-              </p>
+              <p><strong>E-mail:</strong> {perfil.email}</p>
 
               {perfil.bio && (
-                <p>
-                  <strong>Bio:</strong> {perfil.bio}
-                </p>
+                <p><strong>Bio:</strong> {perfil.bio}</p>
               )}
 
               {meuPerfil && (
                 <div>
                   <button
+                    type="button"
                     onClick={() => editarPerfil(perfil)}
                     style={botao}
                   >
@@ -543,6 +508,7 @@ export default function App() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => excluirPerfil(perfil.id)}
                     style={botaoExcluir}
                   >
@@ -558,10 +524,7 @@ export default function App() {
   );
 }
 
-// =========================
 // ESTILOS
-// =========================
-
 const pagina = {
   minHeight: "100vh",
   background: "#fffaf0",
@@ -596,6 +559,8 @@ const cabecalho = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  gap: "16px",
+  flexWrap: "wrap",
   marginBottom: "30px",
 };
 
@@ -648,6 +613,7 @@ const card = {
   marginBottom: "15px",
   borderRadius: "12px",
   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  overflowWrap: "anywhere",
 };
 
 const erroStyle = {
@@ -656,6 +622,7 @@ const erroStyle = {
   padding: "12px",
   borderRadius: "8px",
   marginBottom: "20px",
+  overflowWrap: "anywhere",
 };
 
 const sucessoStyle = {
@@ -664,5 +631,5 @@ const sucessoStyle = {
   padding: "12px",
   borderRadius: "8px",
   marginBottom: "20px",
+  overflowWrap: "anywhere",
 };
-

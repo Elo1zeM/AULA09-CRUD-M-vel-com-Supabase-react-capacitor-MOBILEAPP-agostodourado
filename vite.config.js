@@ -25,4 +25,3 @@ export default defineConfig({
 
   base: "/AULA09-CRUD-M-vel-com-Supabase-react-capacitor-MOBILEAPP-agostodourado/",
 });
-

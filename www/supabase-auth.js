@@ -61,8 +61,18 @@
         if (error) console.error(error);
     };
 
-  cliente.auth.onAuthStateChange(function (evento, sessao) {
+    cliente.auth.onAuthStateChange(function (evento, sessao) {
+        if (!sessao || !sessao.user) return;
 
+        salvarUsuario(sessao.user);
+
+        if (
+            ehPaginaDeEntrada &&
+            (evento === "SIGNED_IN" || evento === "INITIAL_SESSION")
+        ) {
+            window.location.replace("comunidade.html");
+        }
+    });
 
     document.addEventListener("DOMContentLoaded", function () {
         const botao = document.getElementById("btnGoogle");

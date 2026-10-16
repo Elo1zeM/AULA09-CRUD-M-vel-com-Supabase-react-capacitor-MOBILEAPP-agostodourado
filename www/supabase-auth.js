@@ -79,7 +79,7 @@
             provider: "google",
             options: {
                 // volta para o login.html, que conclui o login e segue para a comunidade
-                redirectTo: new URL("login.html", window.location.href).href
+                redirectTo: "https://aula09-crud-m-vel-com-supabase-react-capacitor-mobileapp-a.pages.dev/login.html"
             }
         });
 

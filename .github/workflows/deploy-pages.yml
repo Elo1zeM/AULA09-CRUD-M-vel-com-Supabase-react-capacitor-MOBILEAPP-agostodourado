@@ -37,7 +37,7 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-            - name: Verificar variáveis do Supabase
+      - name: Verificar variáveis do Supabase
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}

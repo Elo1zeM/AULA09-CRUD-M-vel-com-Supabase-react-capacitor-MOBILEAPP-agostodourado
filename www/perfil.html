@@ -391,18 +391,20 @@
         // SAIR
         // =============================
 
-        async function sair() {
-
-        await sairDoSupabase();
-
-            localStorage.removeItem(
-                "agostoUsuarioLogado"
-            );
-
-            window.location.href =
-                "index.html";
-
+        
+async function sair() {
+    try {
+        if (typeof sairDoSupabase === "function") {
+            await sairDoSupabase();
         }
+    } catch (erro) {
+        console.error("Erro ao encerrar sessão:", erro);
+    } finally {
+        localStorage.removeItem("agostoUsuarioLogado");
+        window.location.href = "index.html";
+    }
+}
+
 
 
         carregarPerfil();

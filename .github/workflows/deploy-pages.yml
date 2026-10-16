@@ -37,6 +37,21 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+            - name: Verificar variáveis do Supabase
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ]; then
+            echo "::error::A URL do Supabase não chegou ao build."
+            exit 1
+          fi
+          if [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::error::A chave pública não chegou ao build."
+            exit 1
+          fi
+          echo "As duas variáveis foram recebidas."
+
       - name: Compilar React
         run: npm run build
         env:
